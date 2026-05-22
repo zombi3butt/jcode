@@ -59,6 +59,10 @@ fn parse_and_prepare_args() -> Result<Args> {
         crate::env::set_var("JCODE_TRACE", "1");
     }
 
+    if args.no_context_files {
+        crate::env::set_var("JCODE_NO_CONTEXT_FILES", "1");
+    }
+
     if let Some(ref socket) = args.socket {
         server::set_socket_path(socket);
     }

@@ -3,6 +3,11 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+/// Whether context files should be skipped (set by --no-context-files or JCODE_NO_CONTEXT_FILES env var).
+pub fn context_files_disabled() -> bool {
+    std::env::var("JCODE_NO_CONTEXT_FILES").is_ok()
+}
+
 /// Default system prompt for jcode (embedded at compile time)
 pub const DEFAULT_SYSTEM_PROMPT: &str = include_str!("prompt/system_prompt.md");
 const SELFDEV_HINT_PROMPT: &str = include_str!("prompt/selfdev_hint.txt");
@@ -601,6 +606,10 @@ fn gpu_summary() -> Option<String> {
 
 /// Load AGENTS.md files from a specific working directory
 pub fn load_agents_md_files_from_dir(working_dir: Option<&Path>) -> (Option<String>, ContextInfo) {
+    if context_files_disabled() {
+        eprintln!("Context files disabled (--no-context-files)");
+        return (None, ContextInfo::default());
+    }
     let mut contents = vec![];
     let mut info = ContextInfo::default();
 
